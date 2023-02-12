@@ -1,0 +1,33 @@
+t=0:step:tt;
+Ang_sim=[];
+eval(sprintf('Ang_sim=[Ang_sim,teta%d.Data+Ang(1,%d)];',[1:7;1:7]));
+Ang_sim=spline(teta1.Time',Ang_sim',t);
+Ang_sim=Ang_sim';
+Err=trapz(t,abs(Ang_sim-Ang));
+% [0.6957    0.2441    0.1542    0.4544    0.4045    0.4051    0.4050];
+name={'\theta_2','\theta_3','\theta_4','\theta_5','\theta_6','\theta_7'};
+str=[name;num2cell(Err(2:end))];
+str=[num2cell(repmat(1:6,3,1));str];
+figure(1000)
+eval(sprintf('subplot(3,2,%d); plot(t,Ang(:,%d),''-k'',t,Ang_sim(:,%d),''-.k''); title(''Err %s = %5.4f''); xlabel(''T(sec)''); ylabel(''Angle(rad)'');',str{:}));
+legend('ODE','DAE(SimMech)');
+figure(2000)
+subplot(1,2,1);
+plot(t,Ang(:,1),'k');
+hold on;
+plot(t,Ang_sim(:,1),'k-.');
+eval(sprintf('title(''Err of Generelized coordinate = %5.4f'');',Err(1)));
+xlabel('Time(sec)');
+ylabel('Angle(rad)');
+subplot(1,2,2);
+Qdot_sim=tetad1.Data;
+t_new=tetad1.Time;
+Qdot=spline(t,Qdot(1:end-1),tetad1.Time);
+err_v=trapz(t_new,abs(Qdot-Qdot_sim));
+plot(t_new,Qdot,'k');
+hold on;
+plot(t_new,Qdot_sim,'k-.');
+eval(sprintf('title(''Err of Speed coordinate = %5.4f'');',err_v));
+xlabel('Time(sec)');
+ylabel('Velocity(rad/s)');
+legend('ODE','DAE(SimMech)');
